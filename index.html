@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages from the End of Universe</title>
+    <style>
+        body {
+            background-image: url('images/star.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        input, textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            background: rgba(85, 84, 85, 0.57);
+            color: #f0f0f0;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #36333a;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2e2e2e;
+        }
+        #outputMessage {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            word-wrap: break-word;
+        }
+        a:link {
+        color: rgb(178, 185, 178);
+        background-color: transparent;
+        text-decoration: none;
+        }
+
+        a:visited {
+        color: rgb(178, 185, 178);
+        background-color: transparent;
+        text-decoration: none;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 style="font-family: Georgia">Messages from the End of Universe</h1>
+        <textarea id="inputText" placeholder="输入密文" rows="4"></textarea>
+        <input type="text" id="key" placeholder="输入密钥" />
+        <input type="text" id="uid" placeholder="输入发信人UID" />
+        <button onclick="processText()">解码</button>
+        <p id="outputMessage"></p>
+    </div>
+
+    <script>
+        function processText() {
+            // Get user inputs
+            let encryptedText = document.getElementById('inputText').value;
+            let key = document.getElementById('key').value;
+            let uid = document.getElementById('uid').value;
+
+            try {
+                // Encrypt
+                // let encrypted = CryptoJS.DES.encrypt(encryptedText, key,{ iv: iv });
+                // let decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+
+                // Decrypt the text using DES
+                let decrypted = CryptoJS.DES.decrypt(encryptedText, key);
+                let decryptedTextUID = decrypted.toString(CryptoJS.enc.Utf8);
+
+                if (!decryptedTextUID) {
+                    throw new Error('Invalid decryption');
+                }
+                // Remove UID from end of decryptedText
+                let decryptedText = decryptedTextUID.slice(0, decryptedTextUID.length - uid.length);
+
+                // // Decode the decrypted text from Base64 using CryptoJS
+                let base64DecodedText = CryptoJS.enc.Base64.parse(decryptedText);
+                let decodedText = CryptoJS.enc.Utf8.stringify(base64DecodedText);
+
+                // Output the decoded message
+                document.getElementById('outputMessage').innerText = decodedText;
+            } catch (e) {
+                document.getElementById('outputMessage').innerText = '输入错误';
+            }
+        }
+    </script>
+    <li><a href="encode.html">To send your own message</a></li>
+</body>
+</html>
