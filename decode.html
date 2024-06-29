@@ -58,6 +58,7 @@
         background-color: transparent;
         text-decoration: none;
         }
+
         a:visited {
         color: rgb(178, 185, 178);
         background-color: transparent;
@@ -68,38 +69,51 @@
 </head>
 <body>
     <div class="container">
-        <h1 style="font-family: Georgia">Send your own message</h1>
-        <textarea id="inputText" placeholder="输入明文" rows="4"></textarea>
+        <h1 style="font-family: Georgia">Messages from the End of Universe</h1>
+        <textarea id="inputText" placeholder="输入密文" rows="4"></textarea>
         <input type="text" id="key" placeholder="输入密钥,需为8位数字或字母" />
         <input type="text" id="uid" placeholder="输入发信人UID" />
-        <button onclick="processText()">编码</button>
+        <button onclick="processText()">解码</button>
         <p id="outputMessage"></p>
     </div>
 
     <script>
         function processText() {
             // Get user inputs
-            let Text = document.getElementById('inputText').value;
+            let encryptedText = document.getElementById('inputText').value;
             let key = document.getElementById('key').value;
             let uid = document.getElementById('uid').value;
 
             try {
-                // Text to base64
-                let encodedText = CryptoJS.enc.Utf8.parse(Text);
-                let base64Text = CryptoJS.enc.Base64.stringify(encodedText);
-                // Append UID end of base64Text
-                let base64TextUID = base64Text.concat(uid)
                 // Encrypt
-                let encrypted = CryptoJS.DES.encrypt(base64TextUID, key);
-                let encryptedText = encrypted.toString();
+                // let encrypted = CryptoJS.DES.encrypt(encryptedText, key,{ iv: iv });
+                // let decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+
+                // Decrypt the text using DES
+                let decrypted = CryptoJS.DES.decrypt(encryptedText, key);
+                let decryptedTextUID = decrypted.toString(CryptoJS.enc.Utf8);
+
+                if (!decryptedTextUID) {
+                    throw new Error('Invalid decryption');
+                }
+                // Remove UID from end of decryptedText
+                let trueUID = decryptedTextUID.slice(- uid.length,decryptedTextUID.length);
+                if (trueUID != uid){
+                    throw new Error('Wrong UID');
+                }
+                let decryptedText = decryptedTextUID.slice(0, decryptedTextUID.length - uid.length);
+
+                // // Decode the decrypted text from Base64 using CryptoJS
+                let base64DecodedText = CryptoJS.enc.Base64.parse(decryptedText);
+                let decodedText = CryptoJS.enc.Utf8.stringify(base64DecodedText);
 
                 // Output the decoded message
-                document.getElementById('outputMessage').innerText = encryptedText;
+                document.getElementById('outputMessage').innerText = decodedText;
             } catch (e) {
-                document.getElementById('outputMessage').innerText = '编码失败,请检查输入是否符合格式要求';
+                document.getElementById('outputMessage').innerText = '输入错误';
             }
         }
     </script>
-    <li><a href="decode.html">To decode the message</a></li>
+    <li><a href="encode.html">To send your own message</a></li>
 </body>
 </html>
